@@ -31,7 +31,6 @@ function s.initial_effect(c)
     e4:SetCountLimit(1)
     e4:SetTarget(s.thtg)
     e4:SetOperation(s.thop)
-    e4:SetCondition(s.spcon)
     c:RegisterEffect(e4)
     --Avoid Battle Damage
     local e5=Effect.CreateEffect(c)
@@ -93,12 +92,6 @@ function s.damval(e,re,val,r,rp,rc)
 end
 function s.extg(e,c)
     return c:IsRace(RACE_FAIRY) and c:IsAttribute(ATTRIBUTE_LIGHT) 
-end
-function s.cfilter(c)
-    return c:IsFaceup() and c:IsRace(RACE_FAIRY) and c:IsAttribute(ATTRIBUTE_LIGHT) 
-end
-function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-    return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
     if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>2 end
