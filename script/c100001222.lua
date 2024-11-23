@@ -12,7 +12,6 @@ function s.initial_effect(c)
     e2:SetCode(EFFECT_QP_ACT_IN_NTPHAND)
     e2:SetRange(LOCATION_FZONE)
     e2:SetTargetRange(LOCATION_HAND,0)
-    e2:SetCondition(s.spcon)
     e2:SetTarget(s.handtg)
     c:RegisterEffect(e2)
     --Change Code
@@ -32,7 +31,6 @@ function s.initial_effect(c)
     e4:SetCountLimit(1)
     e4:SetTarget(s.thtg)
     e4:SetOperation(s.thop)
-    e4:SetCondition(s.spcon)
     c:RegisterEffect(e4)
     --Avoid Battle Damage
     local e5=Effect.CreateEffect(c)
@@ -103,12 +101,6 @@ function s.damval(e,re,val,r,rp,rc)
 end
 function s.extg(e,c)
     return c:IsRace(RACE_FAIRY) and c:IsAttribute(ATTRIBUTE_LIGHT)
-end
-function s.cfilter(c)
-    return c:IsFaceup() and c:IsRace(RACE_FAIRY) and c:IsAttribute(ATTRIBUTE_LIGHT)
-end
-function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-    return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function s.handtg(e,c)
     return c:IsType(TYPE_COUNTER)
