@@ -9,7 +9,7 @@ function s.initial_effect(c)
     --Activate Counter Traps from hand
     local e2=Effect.CreateEffect(c)
     e2:SetType(EFFECT_TYPE_FIELD)
-    e2:SetCode(EFFECT_QP_ACT_IN_NTPHAND)
+    e2:SetCode(EFFECT_TRAP_ACT_IN_HAND)
     e2:SetRange(LOCATION_FZONE)
     e2:SetTargetRange(LOCATION_HAND,0)
     e2:SetTarget(s.handtg)
