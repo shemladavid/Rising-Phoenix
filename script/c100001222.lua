@@ -71,6 +71,7 @@ function s.initial_effect(c)
     c:RegisterEffect(e9)
     --Send Cards to Deck
     local e10=Effect.CreateEffect(c)
+    e10:SetDescription(aux.Stringid(id,1))
     e10:SetCategory(CATEGORY_TODECK)
     e10:SetType(EFFECT_TYPE_IGNITION)
     e10:SetRange(LOCATION_SZONE)
