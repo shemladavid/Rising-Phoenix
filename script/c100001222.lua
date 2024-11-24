@@ -95,7 +95,7 @@ function s.con(e)
     return true
 end
 function s.indtg(e,c)
-    return c:IsRace(RACE_FAIRY) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsLevelBelow(4)
+    return c:IsRace(RACE_FAIRY) and c:IsAttribute(ATTRIBUTE_LIGHT)
 end
 function s.damval(e,re,val,r,rp,rc)
     if bit.band(r,REASON_EFFECT)~=0 and rp~=e:GetOwnerPlayer() then return 0 else return val end
