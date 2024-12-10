@@ -36,6 +36,27 @@ function s.initial_effect(c)
 	e4:SetTarget(s.distg)
 	e4:SetOperation(s.disop)
 	c:RegisterEffect(e4)
+	--avoid battle damage
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_FIELD)
+	e5:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
+	e5:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	e5:SetRange(LOCATION_FZONE)
+	e5:SetTargetRange(1,0)
+	e5:SetValue(1)
+	c:RegisterEffect(e5)
+	--avoid effect damage
+	local e6=Effect.CreateEffect(c)
+	e6:SetType(EFFECT_TYPE_FIELD)
+	e6:SetCode(EFFECT_CHANGE_DAMAGE)
+	e6:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e6:SetRange(LOCATION_FZONE)
+	e6:SetTargetRange(1,0)
+	e6:SetValue(s.damval)
+	c:RegisterEffect(e6)
+	local e7=e6:Clone()
+	e7:SetCode(EFFECT_NO_EFFECT_DAMAGE)
+	c:RegisterEffect(e7)
 end
 function s.filter(c)
 	return c:IsSetCard(0x75F) and c:IsAbleToHand()
@@ -81,4 +102,9 @@ function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
+end
+
+function s.damval(e,re,val,r,rp,rc)
+	if r&REASON_EFFECT~=0 then return 0 end
+	return val
 end
