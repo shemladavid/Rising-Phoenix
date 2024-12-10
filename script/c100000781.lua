@@ -19,11 +19,11 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	--Alwayes 2000 LP
 	local e3=Effect.CreateEffect(c)
-		e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e3:SetRange(LOCATION_FZONE)
-		e3:SetCode(EVENT_ADJUST)
-		e3:SetOperation(s.lpop)
-		c:RegisterEffect(e3)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e3:SetRange(LOCATION_FZONE)
+	e3:SetCode(EVENT_ADJUST)
+	e3:SetOperation(s.lpop)
+	c:RegisterEffect(e3)
 	--negate
 	local e4=Effect.CreateEffect(c)
 	e4:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
@@ -59,8 +59,8 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.lpop(e,tp,eg,ep,ev,re,r,rp)
     local lp=Duel.GetLP(tp)
-    if lp~=4000 then
-        Duel.SetLP(tp,4000)
+    if lp~=2000 then
+        Duel.SetLP(tp,2000)
     end
 end
 function s.disfilter(c)
