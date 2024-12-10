@@ -19,13 +19,11 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	--Alwayes 2000 LP
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e3:SetRange(LOCATION_FZONE)
-	e3:SetTargetRange(1,0)
-	e3:SetTarget(s.lptg)
-	e3:SetOperation(s.lpop)
-	c:RegisterEffect(e3)
+		e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e3:SetRange(LOCATION_FZONE)
+		e3:SetCode(EVENT_ADJUST)
+		e3:SetOperation(s.lpop)
+		c:RegisterEffect(e3)
 	--negate
 	local e4=Effect.CreateEffect(c)
 	e4:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
@@ -59,13 +57,11 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,g)
 	end
 end
-function s.lptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLP(tp)<4000 end
-	Duel.SetTargetPlayer(tp)
-end
 function s.lpop(e,tp,eg,ep,ev,re,r,rp)
-	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
-	Duel.SetLP(p,4000)
+    local lp=Duel.GetLP(tp)
+    if lp~=4000 then
+        Duel.SetLP(tp,4000)
+    end
 end
 function s.disfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x23)
