@@ -4,7 +4,16 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 	-- Fusion Summon using 3 "Sky Army" monsters
     Fusion.AddProcMixN(c, true, true, aux.FilterBoolFunction(Card.IsFusionSetCard, 0x764), 3)
-    Fusion.AddContactProc(c, s.contactfil, s.contactop, nil, nil, nil, nil, false)
+    --Alt. Special Summon procedure
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_FIELD)
+	e0:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+	e0:SetCode(EFFECT_SPSUMMON_PROC)
+	e0:SetRange(LOCATION_EXTRA)
+	e0:SetCondition(s.hspcon)
+	e0:SetTarget(s.hsptg)
+	e0:SetOperation(s.hspop)
+	c:RegisterEffect(e0)
 	--atk up
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -34,40 +43,39 @@ function s.initial_effect(c)
 	e4:SetOperation(s.operation22)
 	c:RegisterEffect(e4)
 end
-function s.contactfil(c)
-    return c:IsType(TYPE_TRAP) and c:IsType(TYPE_CONTINUOUS)
-        and c:IsSetCard(0x764) and not c:IsPublic()
+-- Change the filter so it only checks for Continuous Trap cards (no cost requirement)
+function s.ctrapfilter(c)
+	return c:IsContinuousTrap()
 end
 
--- Operation: Reveal the selected 3 cards (with different names) and shuffle your hand
-function s.contactop(g)
-    local tp = g:GetFirst():GetControler()
-    -- Ensure exactly 3 cards with different card codes are selected
-    if g:GetCount() ~= 3 or g:GetClassCount(Card.GetCode) ~= 3 then return end
-    Duel.ConfirmCards(1-tp, g)
-    Duel.ShuffleHand(tp)
-end
-function s.spcfilter(c)
-	return c:IsSetCard(0x764) and c:IsType(TYPE_TRAP+TYPE_CONTINUOUS) and not c:IsPublic()
-end
-function s.spcon(e,c)
+-- Updated condition: Only look in the hand for 3 Continuous Trap cards.
+function s.hspcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	local hg=Duel.GetMatchingGroup(s.spcfilter,tp,LOCATION_HAND,0,c)
-	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and hg:GetClassCount(Card.GetCode)>=3
+	local g=Duel.GetMatchingGroup(s.ctrapfilter, tp, LOCATION_HAND, 0, nil)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,13301895), tp, LOCATION_ONFIELD, 0, 1, nil)
+		and #g>=3 and Duel.GetLocationCountFromEx(tp, tp) > 0
 end
-function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local hg=Duel.GetMatchingGroup(s.spcfilter,tp,LOCATION_HAND,0,c)
-	local rg=Group.CreateGroup()
-	for i=1,3 do
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
-		local g=hg:Select(tp,1,1,nil)
-		local tc=g:GetFirst()
-		rg:AddCard(tc)
-		hg:Remove(Card.IsCode,nil,tc:GetCode())
+
+-- Updated target function: Select 3 Continuous Trap cards from your hand to reveal.
+function s.hsptg(e,tp,eg,ep,ev,re,r,rp,chk,c)
+	local g=Duel.GetMatchingGroup(s.ctrapfilter, tp, LOCATION_HAND, 0, nil)
+	local rg=aux.SelectUnselectGroup(g, e, tp, 3, 3, nil, 1, tp, HINTMSG_CONFIRM)
+	if rg then
+		rg:KeepAlive()
+		e:SetLabelObject(rg)
+		return true
 	end
-	Duel.ConfirmCards(1-tp,rg)
+	return false
+end
+
+-- Updated operation: Reveal the selected cards to your opponent and then shuffle your hand.
+function s.hspop(e,tp,eg,ep,ev,re,r,rp,c)
+	local rg=e:GetLabelObject()
+	if not rg then return end
+	Duel.ConfirmCards(1-tp, rg)
 	Duel.ShuffleHand(tp)
+	rg:DeleteGroup()
 end
 function s.filter22(c,tp)
 	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEUP)
