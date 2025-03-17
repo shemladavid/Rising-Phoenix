@@ -4,7 +4,7 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 	-- Fusion Summon using 3 "Sky Army" monsters
     Fusion.AddProcMixN(c, true, true, aux.FilterBoolFunction(Card.IsFusionSetCard, 0x764), 3)
-	Fusion.AddContactProc(c, s.contactfilter, LOCATION_HAND, 0, s.contactop, 3, s.contactcheck)
+    Fusion.AddContactProc(c, s.contactfil, s.contactop, nil, nil, nil, nil, false)
 	--atk up
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -34,18 +34,16 @@ function s.initial_effect(c)
 	e4:SetOperation(s.operation22)
 	c:RegisterEffect(e4)
 end
-function s.contactfilter(c)
-    return c:IsType(TYPE_TRAP) and c:IsType(TYPE_CONTINUOUS) and c:IsSetCard(0x764) and not c:IsPublic()
+function s.contactfil(c)
+    return c:IsType(TYPE_TRAP) and c:IsType(TYPE_CONTINUOUS)
+        and c:IsSetCard(0x764) and not c:IsPublic()
 end
 
--- Group check: Ensure exactly 3 cards with different card codes are selected
-function s.contactcheck(g)
-    return g:GetCount() == 3 and g:GetClassCount(Card.GetCode) == 3
-end
-
--- Operation: Reveal the selected cards to your opponent and shuffle your hand afterwards
+-- Operation: Reveal the selected 3 cards (with different names) and shuffle your hand
 function s.contactop(g)
     local tp = g:GetFirst():GetControler()
+    -- Ensure exactly 3 cards with different card codes are selected
+    if g:GetCount() ~= 3 or g:GetClassCount(Card.GetCode) ~= 3 then return end
     Duel.ConfirmCards(1-tp, g)
     Duel.ShuffleHand(tp)
 end
