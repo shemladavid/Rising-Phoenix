@@ -14,8 +14,8 @@ function c100000718.initial_effect(c)
 	e2:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetTargetRange(0,LOCATION_MZONE)
-	e2:SetCondition(c100000718.atkcon)
-	e2:SetTarget(c100000718.atktg)
+	e2:SetCondition(s.atkcon)
+	e2:SetTarget(s.atktg)
 	c:RegisterEffect(e2)
 	--check
 	local e3=Effect.CreateEffect(c)
@@ -23,7 +23,7 @@ function c100000718.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e3:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e3:SetRange(LOCATION_SZONE)
-	e3:SetOperation(c100000718.checkop)
+	e3:SetOperation(s.checkop)
 	e3:SetLabelObject(e2)
 	c:RegisterEffect(e3)
 	--Activate
@@ -49,20 +49,18 @@ end
 function c100000718.ccfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x764) and c:IsType(TYPE_MONSTER)
 end
-function c100000718.atkcon(e)
-	return e:GetHandler():GetFlagEffect(100000718)~=0
+function s.atkcon(e)
+	return e:GetHandler():GetFlagEffect(id)~=0
 end
-function c100000718.atktg(e,c)
+function s.atktg(e,c)
 	return c:GetFieldID()~=e:GetLabel()
 end
-function c100000718.checkop(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetHandler():GetFlagEffect(100000718)~=0 then return end
+function s.checkop(e,tp,eg,ep,ev,re,r,rp)
+	if e:GetHandler():GetFlagEffect(id)~=0 then return end
 	local fid=eg:GetFirst():GetFieldID()
-	e:GetHandler():RegisterFlagEffect(100000718,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+	e:GetHandler():RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
 	e:GetLabelObject():SetLabel(fid)
 end
-
-
 function c100000718.handcon(e)
 	return Duel.IsExistingMatchingCard(c100000719.filter,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
 end
