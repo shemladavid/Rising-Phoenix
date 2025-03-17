@@ -51,7 +51,7 @@ function s.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x764) and c:IsType(TYPE_MONSTER)
 end
 function s.aclimit1(e,tp,eg,ep,ev,re,r,rp)
-	if ep== 1-tp or not re:IsActiveType(TYPE_MONSTER) then return end
+	if ep==tp or not re:IsActiveType(TYPE_MONSTER) then return end
 	e:GetHandler():RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD_DISABLE+RESET_CONTROL+RESET_PHASE+PHASE_END,0,1)
 end
 function s.econ1(e)
