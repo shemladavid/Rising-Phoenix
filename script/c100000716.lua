@@ -53,8 +53,7 @@ function s.hspcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	local g=Duel.GetMatchingGroup(s.ctrapfilter, tp, LOCATION_HAND, 0, nil)
-	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,13301895), tp, LOCATION_ONFIELD, 0, 1, nil)
-		and #g>=3 and Duel.GetLocationCountFromEx(tp, tp) > 0
+	return #g>=3 and Duel.GetLocationCountFromEx(tp, tp) > 0
 end
 
 -- Updated target function: Select 3 Continuous Trap cards from your hand to reveal.
