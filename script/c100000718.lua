@@ -1,11 +1,12 @@
 --scripted and created by rising phoenix
-function c100000718.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	Duel.EnableGlobalFlag(GLOBALFLAG_SELF_TOGRAVE)
 		--act in hand
 	local e7=Effect.CreateEffect(c)
 	e7:SetType(EFFECT_TYPE_SINGLE)
 	e7:SetCode(EFFECT_TRAP_ACT_IN_HAND)
-	e7:SetCondition(c100000718.handcon)
+	e7:SetCondition(s.handcon)
 	c:RegisterEffect(e7)
 	--cannot attack
 	local e2=Effect.CreateEffect(c)
@@ -37,16 +38,16 @@ function c100000718.initial_effect(c)
 	e12:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e12:SetRange(LOCATION_SZONE)
 	e12:SetCode(EFFECT_SELF_TOGRAVE)
-	e12:SetCondition(c100000718.descon)
+	e12:SetCondition(s.descon)
 	c:RegisterEffect(e12)
 end
-function c100000718.descon(e)
-	return not Duel.IsExistingMatchingCard(c100000718.filterd,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
+function s.descon(e)
+	return not Duel.IsExistingMatchingCard(s.filterd,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
 end
-function c100000718.ccondition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c100000718.ccfilter,tp,LOCATION_MZONE,0,1,nil)
+function s.ccondition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(s.ccfilter,tp,LOCATION_MZONE,0,1,nil)
 end
-function c100000718.ccfilter(c)
+function s.ccfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x764) and c:IsType(TYPE_MONSTER)
 end
 function s.atkcon(e)
@@ -61,12 +62,12 @@ function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 	e:GetHandler():RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
 	e:GetLabelObject():SetLabel(fid)
 end
-function c100000718.handcon(e)
-	return Duel.IsExistingMatchingCard(c100000719.filter,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
+function s.handcon(e)
+	return Duel.IsExistingMatchingCard(s.filter,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
 end
-function c100000718.filterd(c)
+function s.filterd(c)
 	return c:IsFaceup() and c:IsSetCard(0x764) and c:IsType(TYPE_MONSTER)
 end
-function c100000718.filter(c)
+function s.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x764) and c:IsType(TYPE_MONSTER)
 end
