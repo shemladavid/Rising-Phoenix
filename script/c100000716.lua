@@ -1,16 +1,10 @@
 --scripted and created by rising phoenix
 local s,id=GetID()
 function s.initial_effect(c)	
-c:EnableReviveLimit()
-	--special summon
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_SPSUMMON_PROC)
-	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
-	e1:SetRange(LOCATION_HAND)
-	e1:SetCondition(s.spcon)
-	e1:SetOperation(s.spop)
-	c:RegisterEffect(e1)
+	c:EnableReviveLimit()
+	-- Fusion Summon using 3 "Sky Army" monsters
+    Fusion.AddProcMixN(c, true, true, aux.FilterBoolFunction(Card.IsFusionSetCard, 0x764), 3)
+	Fusion.AddContactProc(c, LOCATION_HAND, 0, s.contactfilter, s.contactop, 3, s.contactcheck)
 	--atk up
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -39,6 +33,17 @@ c:EnableReviveLimit()
 	e4:SetTarget(s.target22)
 	e4:SetOperation(s.operation22)
 	c:RegisterEffect(e4)
+end
+function s.contactfilter(c)
+    return c:IsType(TYPE_TRAP) and c:IsType(TYPE_CONTINUOUS) and c:IsSetCard(0x764) and not c:IsPublic()
+end
+function s.contactcheck(g)
+    return g:GetCount() == 3 and g:GetClassCount(Card.GetCode) == 3
+end
+function s.contactop(g)
+    local tp = g:GetFirst():GetControler()
+    Duel.ConfirmCards(1-tp, g)
+    Duel.ShuffleHand(tp)
 end
 function s.spcfilter(c)
 	return c:IsSetCard(0x764) and c:IsType(TYPE_TRAP+TYPE_CONTINUOUS) and not c:IsPublic()
