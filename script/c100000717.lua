@@ -58,13 +58,23 @@ c:EnableCounterPermit(0x53)
 	e6:SetTarget(s.rtarget)
 	e6:SetOperation(s.roperation)
 	c:RegisterEffect(e6)
+	--Damage and Recover
+	local e7=Effect.CreateEffect(c)
+	e7:SetType(EFFECT_TYPE_TRIGGER_F+EFFECT_TYPE_FIELD)
+	e7:SetCode(EVENT_TO_HAND)
+	e7:SetCategory(CATEGORY_DAMAGE+CATEGORY_RECOVER)
+	e7:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_DELAY)
+	e7:SetRange(LOCATION_SZONE)
+	e7:SetOperation(s.rmop)
+	e7:SetTarget(s.rmtg)
+	c:RegisterEffect(e7)
 	end
-	function s.filter22(c,tp)
+function s.filter22(c,tp)
 	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEUP)
-		and c:IsControler(tp) and c:IsSetCard(0x764) and c:IsType(TYPE_TRAP+TYPE_CONTINUOUS)
+	and c:IsControler(tp) and c:IsSetCard(0x764) and c:IsType(TYPE_TRAP+TYPE_CONTINUOUS)
 end
-	function s.ctcon(e,tp,eg,ep,ev,re,r,rp)
-return	eg:IsExists(s.filter22,1,nil,tp)
+function s.ctcon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(s.filter22,1,nil,tp)
 end
 function s.ctop(e,tp,eg,ep,ev,re,r,rp)
 	e:GetHandler():AddCounter(0x53,1)
@@ -118,4 +128,15 @@ function s.roperation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Draw(p,ct,REASON_EFFECT)
 		Duel.ShuffleHand(p)
 	end
+end
+function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,300)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,300)
+end
+function s.rmop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
+	Duel.Damage(1-tp,300,REASON_EFFECT,true)
+	Duel.Recover(tp,300,REASON_EFFECT,true)
+	Duel.RDComplete()
 end
