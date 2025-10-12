@@ -43,7 +43,6 @@ function s.initial_effect(c)
 	e5:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e5:SetRange(LOCATION_FZONE)
 	e5:SetTargetRange(1,0)
-	e5:SetValue(1)
 	c:RegisterEffect(e5)
 	--No damage
 	local e6=Effect.CreateEffect(c)
@@ -52,7 +51,7 @@ function s.initial_effect(c)
 	e6:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e6:SetRange(LOCATION_FZONE)
 	e6:SetTargetRange(1,0)
-	e6:SetValue(0)
+	e6:SetValue(s.damval)
 	c:RegisterEffect(e6)
 	local e7=e6:Clone()
 	e7:SetCode(EFFECT_NO_EFFECT_DAMAGE)
@@ -102,4 +101,8 @@ function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
+end
+
+function s.damval(e,re,val,r,rp,rc)
+	return (r&REASON_EFFECT)==0 and val or 0
 end
