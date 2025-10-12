@@ -5,64 +5,85 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	--to hand
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
-	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetRange(LOCATION_FZONE)
-	e2:SetCountLimit(1)
-	e2:SetCost(s.thcost)
-	e2:SetTarget(s.thtg)
-	e2:SetOperation(s.thop)
-	c:RegisterEffect(e2)
 	--Alwayes 2000 LP
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e3:SetRange(LOCATION_FZONE)
-	e3:SetCode(EVENT_ADJUST)
-	e3:SetOperation(s.lpop)
-	c:RegisterEffect(e3)
-	--negate
-	local e4=Effect.CreateEffect(c)
-	e4:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
-	e4:SetType(EFFECT_TYPE_QUICK_O)
-	e4:SetCode(EVENT_CHAINING)
-	e4:SetCountLimit(1)
-	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
-	e4:SetRange(LOCATION_FZONE)
-	e4:SetCondition(s.discon)
-	e4:SetTarget(s.distg)
-	e4:SetOperation(s.disop)
-	c:RegisterEffect(e4)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetRange(LOCATION_FZONE)
+	e2:SetCode(EVENT_ADJUST)
+	e2:SetOperation(s.lpop)
+	c:RegisterEffect(e2)
 	--avoid battle damage
-	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_FIELD)
-	e5:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
-	e5:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e5:SetRange(LOCATION_FZONE)
-	e5:SetTargetRange(1,0)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
+	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e3:SetRange(LOCATION_FZONE)
+	e3:SetTargetRange(1,0)
+	c:RegisterEffect(e3)
+	--avoid effect damage
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_FIELD)
+	e4:SetCode(EFFECT_CHANGE_DAMAGE)
+	e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e4:SetRange(LOCATION_FZONE)
+	e4:SetTargetRange(1,0)
+	e4:SetValue(s.damval)
+	c:RegisterEffect(e4)
+	local e5=e4:Clone()
+	e5:SetCode(EFFECT_NO_EFFECT_DAMAGE)
 	c:RegisterEffect(e5)
-	--No damage
+	--to hand
 	local e6=Effect.CreateEffect(c)
-	e6:SetType(EFFECT_TYPE_FIELD)
-	e6:SetCode(EFFECT_CHANGE_DAMAGE)
-	e6:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e6:SetDescription(aux.Stringid(id,0))
+	e6:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e6:SetType(EFFECT_TYPE_IGNITION)
+	e6:SetCode(EVENT_FREE_CHAIN)
 	e6:SetRange(LOCATION_FZONE)
-	e6:SetTargetRange(1,0)
-	e6:SetValue(s.damval)
+	e6:SetCountLimit(1,id)
+	e6:SetCost(s.thcost)
+	e6:SetTarget(s.thtg)
+	e6:SetOperation(s.thop)
 	c:RegisterEffect(e6)
-	local e7=e6:Clone()
-	e7:SetCode(EFFECT_NO_EFFECT_DAMAGE)
+	--negate
+	local e7=Effect.CreateEffect(c)
+	e7:SetDescription(aux.Stringid(id,1))
+	e7:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
+	e7:SetType(EFFECT_TYPE_QUICK_O)
+	e7:SetCode(EVENT_CHAINING)
+	e7:SetCountLimit(1,{id,1})
+	e7:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+	e7:SetRange(LOCATION_FZONE)
+	e7:SetCondition(s.discon)
+	e7:SetTarget(s.distg)
+	e7:SetOperation(s.disop)
 	c:RegisterEffect(e7)
+	-- Special Summon
+	local e8=Effect.CreateEffect(c)
+	e8:SetDescription(aux.Stringid(id,2))
+	e8:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e8:SetType(EFFECT_TYPE_IGNITION)
+	e8:SetRange(LOCATION_FZONE)
+	e8:SetCountLimit(1,{id,2})
+	e8:SetTarget(s.sptg)
+	e8:SetOperation(s.spop)
+	c:RegisterEffect(e8)
+
 end
+s.listed_names={id}
+s.listed_series={0x75F}
+function s.lpop(e,tp,eg,ep,ev,re,r,rp)
+    local lp=Duel.GetLP(tp)
+    if lp~=2000 then
+        Duel.SetLP(tp,2000)
+    end
+end
+
+function s.damval(e,re,val,r,rp,rc)
+	return (r&REASON_EFFECT)==0 and val or 0
+end
+
 function s.filter(c)
-	return c:IsSetCard(0x75F) and c:IsAbleToHand()
-end
-function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckLPCost(tp,1000) end
-	Duel.PayLPCost(tp,1000)
+	return c:IsSetCard(0x75F) and c:IsAbleToHand() and not c:IsCode(id)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
@@ -77,14 +98,9 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,g)
 	end
 end
-function s.lpop(e,tp,eg,ep,ev,re,r,rp)
-    local lp=Duel.GetLP(tp)
-    if lp~=2000 then
-        Duel.SetLP(tp,2000)
-    end
-end
+
 function s.disfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x23)
+	return c:IsFaceup() and c:IsSetCard(0x75F) and c:IsMonster()
 end
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.cfilter1,tp,LOCATION_MZONE,0,1,nil) and rp~=tp 
@@ -103,6 +119,25 @@ function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
-function s.damval(e,re,val,r,rp,rc)
-	return (r&REASON_EFFECT)==0 and val or 0
+function s.spfilter(c,e,tp)
+	return c:IsSetCard(0x75F) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE+LOCATION_REMOVED)
+end
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	local ft=math.max(Duel.GetLocationCount(tp,LOCATION_MZONE),3)
+	if ft<=0 then return end
+	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ft=1 end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,ft,nil,e,tp)
+	if #g>0 then
+		Duel.HintSelection(g)
+		for tc in aux.Next(g) do
+			Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
+		end
+		Duel.SpecialSummonComplete()
+	end
 end
